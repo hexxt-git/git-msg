@@ -11,16 +11,18 @@ interface HeaderProps {
 export function Header({ email, repo, branch, isBranchSelectorOpen }: HeaderProps) {
   return (
     <Box borderStyle="single" borderColor="blue" paddingX={1} justifyContent="space-between">
-      <Box>
-        <Text color="blue">git-messenger</Text>
-        <Text color="gray"> · </Text>
-        <Text>{email}</Text>
-        <Text color="gray"> · </Text>
-        <Text>repo:{repo}</Text>
-        <Text color="gray"> · </Text>
-        <Text color={isBranchSelectorOpen ? 'green' : 'white'}>branch:{branch}</Text>
+      <Box flexShrink={1} paddingRight={2}>
+        <Text>
+          <Text color="blue">git-messenger</Text>
+          <Text color="gray"> · </Text>
+          <Text>{email}</Text>
+          <Text color="gray"> · </Text>
+          <Text>repo:{repo}</Text>
+          <Text color="gray"> · </Text>
+          <Text color={isBranchSelectorOpen ? 'green' : 'white'}>branch:{branch}</Text>
+        </Text>
       </Box>
-      <Box>
+      <Box flexShrink={0}>
         <Text color="gray">[Ctrl+B branches]</Text>
       </Box>
     </Box>
