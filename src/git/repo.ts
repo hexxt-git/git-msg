@@ -17,7 +17,9 @@ export async function getIdentity(cwd: string): Promise<Identity> {
     if (!email) throw new Error('user.email not set');
     return { name: name.trim(), email: email.trim() };
   } catch (e) {
-    throw new Error('Could not read git identity. Please run `git config --global user.email "you@example.com"`');
+    throw new Error(
+      'Could not read git identity. Please run `git config --global user.email "you@example.com"`',
+    );
   }
 }
 
@@ -37,7 +39,9 @@ export async function hasUnpushedCommits(cwd: string, branch: string): Promise<b
   try {
     // Check if branch has an upstream
     await execa('git', ['rev-parse', '--abbrev-ref', `${branch}@{u}`], { cwd });
-    const { stdout } = await execa('git', ['log', `${branch}@{u}..${branch}`, '--oneline'], { cwd });
+    const { stdout } = await execa('git', ['log', `${branch}@{u}..${branch}`, '--oneline'], {
+      cwd,
+    });
     return stdout.trim().length > 0;
   } catch {
     // No upstream usually means we have unpushed commits (the whole branch)

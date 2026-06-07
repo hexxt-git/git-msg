@@ -1,4 +1,11 @@
-import { hasRemote, fetchOrigin, hasUnpushedCommits, mergeFastForward, pullRebase, pushOrigin } from './repo.js';
+import {
+  hasRemote,
+  fetchOrigin,
+  hasUnpushedCommits,
+  mergeFastForward,
+  pullRebase,
+  pushOrigin,
+} from './repo.js';
 
 export async function sync(cwd: string, branch: string): Promise<void> {
   if (!(await hasRemote(cwd))) {
