@@ -1,6 +1,6 @@
 {
   "name": "git-messenger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/cli.js",
   "files": [
@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsc && cp README.md dist/",
     "start": "node dist/cli.js",
-    "test": "tsx test/e2e.test.ts"
+    "test": "tsx test/e2e.test.ts",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "HEXXT <hexxt-git@users.noreply.github.com>",
@@ -36,8 +37,16 @@
   "devDependencies": {
     "@types/node": "^25.9.2",
     "@types/react": "^19.2.17",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,json,md,css}": [
+      "prettier --write"
+    ]
   }
 }

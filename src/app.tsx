@@ -26,7 +26,8 @@ export function App({ cwd, identity, repoName, initialBranch, pollInterval }: Ap
   const [syncState, setSyncState] = useState<SyncState>('idle');
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
-  
+  const [failedIds, setFailedIds] = useState<Map<string, string>>(new Map());
+
   const [isBranchSelectorOpen, setIsBranchSelectorOpen] = useState(false);
   const [branches, setBranches] = useState<string[]>([]);
 
@@ -70,52 +71,70 @@ export function App({ cwd, identity, repoName, initialBranch, pollInterval }: Ap
   }, [cwd, branch, pollInterval, loadMessages]); // omitting syncState from deps to avoid constant resetting of interval
 
   useInput((input, key) => {
-    if ((key.ctrl && input === 'c') || key.escape) {
+    if ((key.ctrl && input === 'c') || (key.ctrl && input === 'd') || key.escape) {
       if (isBranchSelectorOpen) {
         setIsBranchSelectorOpen(false);
       } else {
         exit();
+        process.exit(0);
       }
     }
-    
+
     if (key.ctrl && input === 'b') {
       setIsBranchSelectorOpen(true);
-      listBranches(cwd).then(b => setBranches(b)).catch(() => {});
+      listBranches(cwd)
+        .then((b) => setBranches(b))
+        .catch(() => {});
     }
 
     if (key.ctrl && input === 'r') {
       // Force sync
-      runSync(cwd, branch).then(() => {
-        loadMessages();
-        setLastSync(new Date());
-        setSyncState('idle');
-      }).catch(() => setSyncState('error'));
+      runSync(cwd, branch)
+        .then(() => {
+          loadMessages();
+          setLastSync(new Date());
+          setSyncState('idle');
+        })
+        .catch(() => setSyncState('error'));
     }
   });
 
   const handleSend = async (body: string) => {
+    let id: string | undefined;
     try {
-      const id = await writeMessage(cwd, identity, body);
-      setPendingIds(prev => {
+      id = await writeMessage(cwd, identity, body);
+      setPendingIds((prev) => {
         const next = new Set(prev);
-        next.add(id);
+        next.add(id as string);
         return next;
       });
       await loadMessages(); // optimistically show it
-      
+
       setSyncState('pushing');
-      await commitMessage(cwd, id);
+      await commitMessage(cwd, id as string);
       await pushWithRetry(cwd, branch);
-      
-      setPendingIds(prev => {
+
+      setPendingIds((prev) => {
         const next = new Set(prev);
-        next.delete(id);
+        next.delete(id as string);
         return next;
       });
       setLastSync(new Date());
       setSyncState('idle');
-    } catch (e) {
+    } catch (e: any) {
       setSyncState('error');
+      if (id) {
+        setPendingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id as string);
+          return next;
+        });
+        setFailedIds((prev) => {
+          const next = new Map(prev);
+          next.set(id as string, e.message || 'Unknown error');
+          return next;
+        });
+      }
     }
   };
 
@@ -133,19 +152,29 @@ export function App({ cwd, identity, repoName, initialBranch, pollInterval }: Ap
     setBranch(newBranch);
   };
 
-  const uniqueAuthors = new Set(messages.map(m => m.author)).size;
+  const uniqueAuthors = new Set(messages.map((m) => m.author)).size;
 
   return (
     <Box flexDirection="column" height={process.stdout.rows || 24} width="100%">
-      <Header email={identity.email} repo={repoName} branch={branch} isBranchSelectorOpen={isBranchSelectorOpen} />
-      
+      <Header
+        email={identity.email}
+        repo={repoName}
+        branch={branch}
+        isBranchSelectorOpen={isBranchSelectorOpen}
+      />
+
       <Box flexGrow={1} position="relative">
-        <MessageList messages={messages} pendingIds={pendingIds} height={(process.stdout.rows || 24) - 6} />
-        
+        <MessageList
+          messages={messages}
+          pendingIds={pendingIds}
+          failedIds={failedIds}
+          height={(process.stdout.rows || 24) - 6}
+        />
+
         {isBranchSelectorOpen && (
           <Box position="absolute" top={2} left={4}>
-            <BranchDialog 
-              branches={branches} 
+            <BranchDialog
+              branches={branches}
               currentBranch={branch}
               onSelect={handleBranchSelect}
               onCreateOrphan={handleCreateOrphan}
@@ -155,11 +184,11 @@ export function App({ cwd, identity, repoName, initialBranch, pollInterval }: Ap
         )}
       </Box>
 
-      <StatusBar 
-        syncState={syncState} 
-        lastSync={lastSync} 
-        participants={uniqueAuthors} 
-        messages={messages.length} 
+      <StatusBar
+        syncState={syncState}
+        lastSync={lastSync}
+        participants={uniqueAuthors}
+        messages={messages.length}
       />
       <Composer onSubmit={handleSend} disabled={isBranchSelectorOpen} />
     </Box>

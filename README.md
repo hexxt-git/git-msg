@@ -26,6 +26,8 @@ npm install -g git-messenger
 
 ## Usage
 
+‼️ **Important**: Do not forget to give all participants write access to the git repo! ‼️
+
 Start a chat in any existing Git repository:
 
 ```bash
@@ -67,6 +69,7 @@ Examples
 Every participant clones the repository locally. `git-messenger` reads your identity directly from `git config user.email` and `user.name`.
 
 When you send a message:
+
 1. It writes a unique JSON file to the `messages/` directory (e.g. `2026-06-07T15-04-12__a1b2c3d4.json`).
 2. It runs `git add` and `git commit`.
 3. It pushes to the remote via `git push`.
@@ -78,6 +81,7 @@ In the background, `git-messenger` automatically polls the remote every 5 second
 `git-messenger` includes an automated end-to-end testing suite that creates isolated temporary git repositories, mimics two separate clients interacting, and verifies message syncing logic.
 
 To run the E2E tests:
+
 ```bash
 npm test
 ```

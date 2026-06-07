@@ -18,7 +18,7 @@ export function Header({ email, repo, branch, isBranchSelectorOpen }: HeaderProp
         <Text color="gray"> · </Text>
         <Text>repo:{repo}</Text>
         <Text color="gray"> · </Text>
-        <Text color={isBranchSelectorOpen ? "green" : "white"}>branch:{branch}</Text>
+        <Text color={isBranchSelectorOpen ? 'green' : 'white'}>branch:{branch}</Text>
       </Box>
       <Box>
         <Text color="gray">[Ctrl+B branches]</Text>
