@@ -1,4 +1,4 @@
-# 💬 git-msg
+git-msg
 
 > A group-chat CLI that uses a git repo as the transport.
 
@@ -8,7 +8,7 @@
 
 `git-msg` is a terminal-based chat client that uses regular Git commits and pushes to sync messages. It was specifically designed for environments and networks that only allow outbound SSH access (e.g., to `github.com`). If you can `git push`, you can chat!
 
-## ✨ Features
+## Features
 
 - **Decentralized via Git**: One repository equals one group chat.
 - **Channels**: Branches double as separate chat "rooms". Create orphan branches on the fly to start new topics.
@@ -16,7 +16,7 @@
 - **Interactive TUI**: Built with React Ink, featuring real-time syncing, branch switching, and status indicators.
 - **Zero Server Setup**: Relies entirely on your Git host (GitHub, GitLab, self-hosted, etc.).
 
-## 🚀 Installation
+## Installation
 
 Ensure you have Node.js 20+ installed.
 
@@ -31,7 +31,7 @@ npm run build
 npm link
 ```
 
-## 🎮 Usage
+## Usage
 
 Start a chat in any existing Git repository:
 
@@ -69,7 +69,7 @@ Examples
 - **`Ctrl+R`**: Force sync immediately.
 - **`Ctrl+C` / `Esc`**: Quit.
 
-## 🏗 How it Works
+## How it Works
 
 Every participant clones the repository locally. `git-msg` reads your identity directly from `git config user.email` and `user.name`.
 
@@ -80,7 +80,7 @@ When you send a message:
 
 In the background, `git-msg` automatically polls the remote every 5 seconds. It runs `git fetch` and then either a fast-forward merge or a `git pull --rebase` if you have local unpushed messages. Since every message is a unique file, rebase conflicts do not occur!
 
-## 🧪 Testing
+## Testing
 
 `git-msg` includes an automated end-to-end testing suite that creates isolated temporary git repositories, mimics two separate clients interacting, and verifies message syncing logic.
 
@@ -89,6 +89,6 @@ To run the E2E tests:
 npm test
 ```
 
-## 📝 License
+## License
 
 ISC
