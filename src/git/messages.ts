@@ -10,6 +10,8 @@ export async function ensureMessagesDir(cwd: string): Promise<string> {
   return messagesDir;
 }
 
+const cacheByCwd = new Map<string, Map<string, Message>>();
+
 export async function readMessages(cwd: string): Promise<Message[]> {
   const messagesDir = await ensureMessagesDir(cwd);
   let files: string[];
@@ -19,13 +21,32 @@ export async function readMessages(cwd: string): Promise<Message[]> {
     return [];
   }
 
-  const messageFiles = files.filter(f => f.endsWith('.json')).sort();
+  const messageFiles = files.filter((f) => f.endsWith('.json')).sort();
   const messages: Message[] = [];
 
+  let cache = cacheByCwd.get(cwd);
+  if (!cache) {
+    cache = new Map<string, Message>();
+    cacheByCwd.set(cwd, cache);
+  }
+
+  const currentFiles = new Set(messageFiles);
+  for (const cachedFile of cache.keys()) {
+    if (!currentFiles.has(cachedFile)) {
+      cache.delete(cachedFile);
+    }
+  }
+
   for (const file of messageFiles) {
+    if (cache.has(file)) {
+      messages.push(cache.get(file)!);
+      continue;
+    }
+
     try {
       const content = await fs.readFile(path.join(messagesDir, file), 'utf-8');
       const msg: Message = JSON.parse(content);
+      cache.set(file, msg);
       messages.push(msg);
     } catch {
       // skip invalid/corrupted files
@@ -49,7 +70,7 @@ export async function writeMessage(cwd: string, identity: Identity, body: string
     author: identity.email,
     name: identity.name,
     ts,
-    body
+    body,
   };
 
   await fs.writeFile(path.join(messagesDir, filename), JSON.stringify(msg, null, 2), 'utf-8');

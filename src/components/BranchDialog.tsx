@@ -9,7 +9,13 @@ interface BranchDialogProps {
   onClose: () => void;
 }
 
-export function BranchDialog({ branches, currentBranch, onSelect, onCreateOrphan, onClose }: BranchDialogProps) {
+export function BranchDialog({
+  branches,
+  currentBranch,
+  onSelect,
+  onCreateOrphan,
+  onClose,
+}: BranchDialogProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [newBranchName, setNewBranchName] = useState('');
@@ -29,17 +35,17 @@ export function BranchDialog({ branches, currentBranch, onSelect, onCreateOrphan
           onCreateOrphan(newBranchName.trim());
         }
       } else if (key.backspace || key.delete) {
-        setNewBranchName(prev => prev.slice(0, -1));
+        setNewBranchName((prev) => prev.slice(0, -1));
       } else if (input) {
-        setNewBranchName(prev => prev + input);
+        setNewBranchName((prev) => prev + input);
       }
       return;
     }
 
     if (key.upArrow) {
-      setSelectedIndex(prev => Math.max(0, prev - 1));
+      setSelectedIndex((prev) => Math.max(0, prev - 1));
     } else if (key.downArrow) {
-      setSelectedIndex(prev => Math.min(options.length - 1, prev + 1));
+      setSelectedIndex((prev) => Math.min(options.length - 1, prev + 1));
     } else if (key.return) {
       if (selectedIndex === options.length - 1) {
         setIsCreating(true);
@@ -50,8 +56,17 @@ export function BranchDialog({ branches, currentBranch, onSelect, onCreateOrphan
   });
 
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={2} paddingY={1} width={50}>
-      <Text bold color="yellow">switch branch</Text>
+    <Box
+      flexDirection="column"
+      borderStyle="round"
+      borderColor="yellow"
+      paddingX={2}
+      paddingY={1}
+      width={50}
+    >
+      <Text bold color="yellow">
+        switch branch
+      </Text>
       <Box flexDirection="column" marginY={1}>
         {isCreating ? (
           <Box>

@@ -45,7 +45,7 @@ const cli = meow(
         default: false,
       },
     },
-  }
+  },
 );
 
 async function main() {
@@ -62,7 +62,11 @@ async function main() {
       console.error('Error: missing url for init');
       process.exit(1);
     }
-    const repoName = url.split('/').pop()?.replace(/\.git$/, '') || 'git-messenger-chat';
+    const repoName =
+      url
+        .split('/')
+        .pop()
+        ?.replace(/\.git$/, '') || 'git-messenger-chat';
     cwd = path.resolve(cwd, repoName);
     try {
       await execa('git', ['clone', url, cwd], { stdio: 'inherit' });
@@ -80,7 +84,7 @@ async function main() {
     const { pushWithRetry } = await import('./git/sync.js');
     const id = await writeMessage(cwd, await getIdentity(cwd), body);
     await commitMessage(cwd, id);
-    let branch = cli.flags.branch || await getCurrentBranch(cwd);
+    let branch = cli.flags.branch || (await getCurrentBranch(cwd));
     await pushWithRetry(cwd, branch);
     process.exit(0);
   }
@@ -131,17 +135,17 @@ async function main() {
   console.clear();
 
   render(
-    <App 
-      cwd={cwd} 
-      identity={identity} 
-      repoName={repoName} 
-      initialBranch={branch} 
-      pollInterval={cli.flags.poll} 
-    />
+    <App
+      cwd={cwd}
+      identity={identity}
+      repoName={repoName}
+      initialBranch={branch}
+      pollInterval={cli.flags.poll}
+    />,
   );
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('Fatal error:', err);
   process.exit(1);
 });

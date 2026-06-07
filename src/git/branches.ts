@@ -21,7 +21,11 @@ export async function listBranches(cwd: string): Promise<string[]> {
 
 export async function getMessageCountForBranch(cwd: string, branch: string): Promise<number> {
   try {
-    const { stdout } = await execa('git', ['ls-tree', '-r', '--name-only', branch, '--', 'messages/'], { cwd });
+    const { stdout } = await execa(
+      'git',
+      ['ls-tree', '-r', '--name-only', branch, '--', 'messages/'],
+      { cwd },
+    );
     return stdout.split('\n').filter((l: string) => l.trim().endsWith('.json')).length;
   } catch {
     return 0;
@@ -37,10 +41,13 @@ export async function createOrphanBranch(cwd: string, branch: string): Promise<v
 
   await execa('git', ['checkout', '--orphan', branch], { cwd });
   await execa('git', ['rm', '-rf', '.'], { cwd });
-  
+
   await fs.mkdir(path.join(cwd, 'messages'), { recursive: true });
   await fs.writeFile(path.join(cwd, 'messages', '.gitkeep'), '');
-  await fs.writeFile(path.join(cwd, 'README.md'), '# git-messenger chat branch\nThis is an auto-generated branch for a git-messenger chat group.\n');
+  await fs.writeFile(
+    path.join(cwd, 'README.md'),
+    '# git-messenger chat branch\nThis is an auto-generated branch for a git-messenger chat group.\n',
+  );
   await execa('git', ['add', '.'], { cwd });
   await execa('git', ['commit', '-m', `chat: start ${branch}`], { cwd });
   try {
