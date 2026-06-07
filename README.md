@@ -1,4 +1,4 @@
-git-messenger
+# git-messenger
 
 > A group-chat CLI that uses a git repo as the transport.
 
